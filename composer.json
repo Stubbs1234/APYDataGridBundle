@@ -1,5 +1,5 @@
 {
-    "name": "apy/datagrid-bundle",
+    "name": "14thswc/datagrid-bundle",
     "description": "Symfony Datagrid Bundle",
     "keywords": ["Symfony", "datagrid"],
     "homepage": "https://github.com/apy/APYDataGridBundle",
@@ -52,12 +52,9 @@
     "autoload": {
         "psr-4": { "APY\\DataGridBundle\\": "" }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.2-dev"
-        }
-    },
     "provide": {
         "ext-mongo": "1.5"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

@@ -2133,24 +2133,11 @@ class Grid implements GridInterface
             return $this->getMassActionResponse();
         }
 
+        return $this;
         if ($isReadyForRedirect) {
-            return new RedirectResponse($this->getRouteUrl());
+            new RedirectResponse($this->getRouteUrl());
         } else {
-            if (is_array($param1) || $param1 === null) {
-                $parameters = (array) $param1;
-                $view = $param2;
-            } else {
-                $parameters = (array) $param2;
-                $view = $param1;
-            }
-
-            $parameters = array_merge(['grid' => $this], $parameters);
-
-            if ($view === null) {
-                return $parameters;
-            } else {
-                return new Response($this->container->get('twig')->render($view, $parameters, $response));
-            }
+            return $this;
         }
     }
 
