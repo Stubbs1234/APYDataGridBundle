@@ -2125,20 +2125,15 @@ class Grid implements GridInterface
     {
         $isReadyForRedirect = $this->isReadyForRedirect();
 
-        if ($this->isReadyForExport()) {
-            return $this->getExportResponse();
-        }
+//        if ($this->isReadyForExport()) {
+//            return $this->getExportResponse();
+//        }
 
         if ($this->isMassActionRedirect()) {
             return $this->getMassActionResponse();
         }
 
         return $this;
-        if ($isReadyForRedirect) {
-            new RedirectResponse($this->getRouteUrl());
-        } else {
-            return $this;
-        }
     }
 
     /**

@@ -6,6 +6,8 @@
         <div class="row">
             <div class="col-12">
                 {% if grid.isFilterSectionVisible %}
+                    <h5 style="padding-left: 1rem;"><i class="fas fa-filter"></i> Filters</h5>
+                    <hr style="background-color: black !important;">
                     {{ grid_filters(grid) }}
                 {% endif %}
             </div>
@@ -71,7 +73,7 @@
     {% endif %}
 {% endfor %}
 <tr class="grid-row-cells">
-    <td class="last-column last-row" colspan="{{ nbColumns }}" style="text-align: center;">{{ grid.noResultMessage|default('No result')|trans|raw }}</td>
+    <td class="last-column last-row" colspan="{{ nbColumns }}" style="text-align: center;">{{ grid.noResultMessage|default('No result')|raw }}</td>
 </tr>
 {% endspaceless %}
 {% endblock grid_no_result %}
@@ -95,10 +97,10 @@
                     {% endif %}
                 {% endif %}
 
-                {% set columnTitle = columnTitle|trans({}, translation_domain) %}
+                {% set columnTitle = columnTitle %}
 
                 {% if (column.sortable) %}
-                    <a class="order" href="{{ grid_url('order', grid, column) }}" title="{{ 'Order by'|trans }} {{ columnTitle }}" style="color: black !important;">{{ columnTitle }}</a>
+                    <a class="order" href="{{ grid_url('order', grid, column) }}" title="{{ 'Order by' }} {{ columnTitle }}" style="color: black !important;">{{ columnTitle }}</a>
                     {% if column.order == 'asc' %}
                         <i class="fas fa-sort-up"></i>
                     {% elseif column.order == 'desc' %}
@@ -125,7 +127,7 @@
                         <tr>
                             <td class="last-column" style="border-top: none;">
                                 <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
-                                <a class="grid-reset btn btn-danger" href="{{ grid_url('reset', grid) }}">{{ 'Reset'|trans }}</a>
+                                <a class="grid-reset btn btn-danger" href="{{ grid_url('reset', grid) }}">{{ 'Reset' }}</a>
                             </td>
                     {% endif %}
                     <td class="{% if column.class %}{{ column.class }}{% endif %}" style="{% if(column.size > -1) %} width:{{ column.size }}px;{% endif %} border-top: none;">{% if column.filterable %}{{ grid_filter(column, grid)|raw }}{% endif %}</td>
@@ -146,10 +148,10 @@
                 {% else %}
                     {% set columnTitle = column.title %}
                 {% endif %}
-                <div class="{{ cycle(['odd', 'even'], loop.index) }}"><label>{{ columnTitle|trans }}</label>{{ grid_filter(column, grid, false)|raw }}</div>
+                <div class="{{ cycle(['odd', 'even'], loop.index) }}"><label>{{ columnTitle }}</label>{{ grid_filter(column, grid, false)|raw }}</div>
             {% endif %}
         {% endfor %}
-            <div class="grid-search-action"><input type="submit" class="grid-search-submit" value="{{ 'Search'|trans }}"/><input type="button" class="grid-search-reset" value="{{ 'Reset'|trans }}" onclick="return {{ grid.hash }}_reset();"/></div>
+            <div class="grid-search-action"><input type="submit" class="grid-search-submit" value="{{ 'Search' }}"/><input type="button" class="grid-search-reset" value="{{ 'Reset' }}" onclick="return {{ grid.hash }}_reset();"/></div>
         </form>
     </div>
 {% endif %}
@@ -217,7 +219,7 @@
 {% endblock grid_pager_selectpage %}
 {# ---------------------------------------------------- grid_pager_results_perpage -------------------------------------------------- #}
 {% block grid_pager_results_perpage %}
-{{ 'Display'|trans }}
+{{ 'Display' }}
 <select onchange="return {{ grid.hash }}_resultsPerPage(this.value);">
 {% for key, value in grid.limits %}
     <option value="{{ key }}" {% if (key == grid.limit) %} selected="selected"{% endif %}>{{ value }}</option>
@@ -228,23 +230,23 @@
 {% block grid_actions %}
 <div class="mass-actions">
     <span class="grid_massactions_helper">
-        <a href="#" onclick="return {{ grid.hash }}_markVisible(true);">{{ 'Select visible'|trans }}</a> |
-        <a href="#" onclick="return {{ grid.hash }}_markVisible(false);">{{ 'Deselect visible'|trans }}</a> |
-        <a href="#" onclick="return {{ grid.hash }}_markAll(true);">{{ 'Select all'|trans }}</a> |
-        <a href="#" onclick="return {{ grid.hash }}_markAll(false);">{{ 'Deselect all'|trans }}</a>
+        <a href="#" onclick="return {{ grid.hash }}_markVisible(true);">{{ 'Select visible' }}</a> |
+        <a href="#" onclick="return {{ grid.hash }}_markVisible(false);">{{ 'Deselect visible' }}</a> |
+        <a href="#" onclick="return {{ grid.hash }}_markAll(true);">{{ 'Select all' }}</a> |
+        <a href="#" onclick="return {{ grid.hash }}_markAll(false);">{{ 'Deselect all' }}</a>
         <span class="mass-actions-selected" id="{{ grid.hash }}_mass_action_selected"></span>
     </span>
     {% spaceless %}
     <div style="float:right;" class="grid_massactions">
-        {{ 'Action'|trans }}
+        {{ 'Action' }}
         <input type="hidden" id="{{ grid.hash }}_mass_action_all" name="{{ grid.hash }}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_MASS_ACTION_ALL_KEYS_SELECTED') }}]" value="0"/>
         <select name="{{ grid.hash }}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_MASS_ACTION') }}]">
             <option value="-1"></option>
             {% for key, massAction in grid.massActions %}
-            <option value="{{ key }}">{{ massAction.title|trans }}</option>
+            <option value="{{ key }}">{{ massAction.title }}</option>
             {% endfor %}
         </select>
-        <input type="submit"  value="{{ 'Submit Action'|trans }}"/>
+        <input type="submit"  value="{{ 'Submit Action' }}"/>
     </div>
     {% endspaceless %}
 </div>
@@ -260,7 +262,7 @@
             </button>
             <ul class="dropdown-menu" aria-labelledby="dataGridExport">
                 {% for key, export in grid.exports %}
-                    <li><a class="dropdown-item" href="#">
+                    <li><a class="dropdown-item" onclick="return {{ grid.hash }}_submitExport({{ key }});" >
                             {% if export.fileExtension == 'csv' %}
                                 <i class="fas fa-file-csv"></i>
                             {% elseif export.fileEcrension == 'excel' %}
@@ -268,10 +270,11 @@
                             {% else %}
                                 <i class="fas fa-file"></i>
                             {% endif %}
-                             {{ export.title|trans }}</a></li>
+                             {{ export.title }}</a></li>
                 {% endfor %}
             </ul>
         </div>
+        <input type="hidden" id="{{grid.hash}}_export" name="{{grid.hash}}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_EXPORT') }}]">
 
 
 
@@ -291,14 +294,14 @@
 {% block grid_tweaks %}
 <div class="tweaks" style="float:right">
     {% spaceless %}
-        {{ 'Tweaks'|trans }}
+        {{ 'Tweaks' }}
             <select name="{{grid.hash}}[{{ constant('APY\\DataGridBundle\\Grid\\Grid::REQUEST_QUERY_TWEAK') }}]">
             <option value=""></option>
             {% for key, tweak in grid.tweaks %}
-            <option value="{{key}}">{{ tweak.title|trans }}</option>
+            <option value="{{key}}">{{ tweak.title }}</option>
             {% endfor %}
         </select>
-        <input type="submit" value="{{ 'Tweak'|trans }}"/>
+        <input type="submit" value="{{ 'Tweak' }}"/>
     {% endspaceless %}
 </div>
 {% endblock grid_tweaks %}
@@ -309,7 +312,7 @@
     {% for action in actions %}
         <li>
         {% if action.enabled %}
-            <a href="{{ url(action.route, column.routeParameters(row, action), false) }}" target="{{ action.target }}"{% if action.confirm %} onclick="return confirm('{{ action.confirmMessage }}')"{% endif %}{% for name, value in action.attributes %} {{ name }}="{{ value }}" {% endfor %}>{{ action.title|trans }}</a>
+            <a href="{{ url(action.route, column.routeParameters(row, action), false) }}" target="{{ action.target }}"{% if action.confirm %} onclick="return confirm('{{ action.confirmMessage }}')"{% endif %}{% for name, value in action.attributes %} {{ name }}="{{ value }}" {% endfor %}>{{ action.title }}</a>
         {% else %}
             <span{% for name, value in action.attributes %} {{ name }}="{{ value }}" {% endfor %}>{{ action.title|trans }}</span>
         {% endif %}
@@ -385,7 +388,7 @@
 <span class="grid-filter-operator">
     <select name="{{ grid.hash }}[{{ column.id }}][operator]" onchange="{{ grid.hash }}_switchOperator(this, '{{ grid.hash }}__{{ column.id }}__query__'{% if submitOnChange is same as (false) %}, false{% endif%});">
     {% for operator in column.operators %}
-        <option value="{{ operator }}"{% if op == operator %} selected="selected"{% endif %}>{{ operator |trans }}</option>
+        <option value="{{ operator }}"{% if op == operator %} selected="selected"{% endif %}>{{ operator }}</option>
     {% endfor %}
     </select>
 </span>
@@ -442,7 +445,7 @@
             <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ grid.hash }}[{{ column.id }}][to]" value="{{ key }}" {% if not to is null and to == key %} checked="checked"{% endif %} {% if submitOnChange is same as (true) %}onclick="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%}/><label>{{ value }}</label></span>
         {% endfor %}
         </span>
-        {% if multiple %}<input type="submit" value="{{ 'Go'|trans }}" />{% endif %}
+        {% if multiple %}<input type="submit" value="{{ 'Go' }}" />{% endif %}
     {% else %}
         <select{% if multiple %} multiple="multiple"{% endif %} name="{{ grid.hash }}[{{ column.id }}][from][]" class="grid-filter-select-query-from" id="{{ grid.hash }}__{{ column.id }}__query__from" {% if submitOnChange is same as (true) %}onchange="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%} {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none;" disabled="disabled"' : '' }}>
             <option value="">&nbsp;</option>
@@ -456,14 +459,14 @@
                 <option value="{{ key }}"{% if not to is null and to == key %} selected="selected"{% endif %}>{{ value }}</option>
             {% endfor %}
         </select>
-        {% if multiple %}<input type="submit" value="{{ 'Go'|trans }}" />{% endif %}
+        {% if multiple %}<input type="submit" value="{{ 'Go' }}" />{% endif %}
     {% endif %}
     </span>
 </span>
 {% endblock grid_column_filter_type_select %}
 {# -------------------------------------------- grid_column_filter_type_massaction --------------------------------------- #}
 {% block grid_column_filter_type_massaction %}
-    <input type="button" class="grid-search-reset" value="R" title="{{ 'Reset'|trans }}" onclick="return {{ grid.hash }}_reset();"/>
+    <input type="button" class="grid-search-reset" value="R" title="{{ 'Reset' }}" onclick="return {{ grid.hash }}_reset();"/>
 {% endblock grid_column_filter_type_massaction %}
 {# -------------------------------------------- grid_column_filter_type_massaction_filter --------------------------------------- #}
 
@@ -483,6 +486,7 @@
 {{ grid_scripts_switch_operator(grid) }}
 {{ grid_scripts_submit_form(grid) }}
 {{ grid_scripts_ajax(grid) }}
+{{ grid_script_export(grid) }}
 </script>
 {% endblock grid_scripts %}
 
@@ -563,7 +567,7 @@ function {{ grid.hash }}_markVisible(select)
     {% endif %}
 
     var selected = document.getElementById('{{ grid.hash }}_mass_action_selected');
-    selected.innerHTML = counter > 0 ? '{{ 'Selected _s_ rows'|trans }}'.replace('_s_', counter) : '';
+    selected.innerHTML = counter > 0 ? '{{ 'Selected _s_ rows' }}'.replace('_s_', counter) : '';
 
     document.getElementById('{{ grid.hash }}_mass_action_all').value = '0';
 
@@ -586,7 +590,7 @@ function {{ grid.hash }}_markAll(select)
 
     if (select) {
         document.getElementById('{{ grid.hash }}_mass_action_all').value = '1';
-        selected.innerHTML = '{{ 'Selected _s_ rows'|trans }}'.replace('_s_', '{{ grid.totalCount }}');
+        selected.innerHTML = '{{ 'Selected _s_ rows' }}'.replace('_s_', '{{ grid.totalCount }}');
     } else {
         document.getElementById('{{ grid.hash }}_mass_action_all').value = '0';
         selected.innerHTML = '';
@@ -639,3 +643,15 @@ function {{ grid.hash }}_submitForm(event, form)
 
 {% block grid_scripts_ajax %}
 {% endblock grid_scripts_ajax %}
+
+{% block grid_script_export %}
+function {{ grid.hash }}_submitExport(key)
+{
+    var x = document.getElementById("{{grid.hash}}_export");
+    x.value = key;
+
+    document.getElementById("{{grid.hash}}").submit();
+
+    return true;
+}
+{% endblock %}
