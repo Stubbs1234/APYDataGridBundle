@@ -326,7 +326,11 @@
 {% endblock grid_column_massaction_cell %}
 {# ------------------------------------------------ grid_column_type_boolean_cell --------------------------------------------- #}
 {% block grid_column_boolean_cell %}
-    <span class="grid_boolean_{{ value }}" title="{{ value }}">{{ block('grid_column_cell') }}</span>
+    {% if value is same as 'true' %}
+        <span class="grid_boolean_{{ value }}" title="{{ value }}"><i class="fas fa-check" style="color: green;font-size: 25px;"></i></span>
+    {% elseif value is same as 'false' %}
+        <span class="grid_boolean_{{ value }}" title="{{ value }}"><i class="fas fa-times" style="color: red;font-size: 25px;"></i></span>
+    {% endif %}
 {% endblock grid_column_boolean_cell %}
 {% block grid_column_type_boolean_cell %}
 	{{ block('grid_column_boolean_cell') }}
