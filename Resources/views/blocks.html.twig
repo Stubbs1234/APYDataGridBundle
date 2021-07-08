@@ -20,6 +20,12 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-12">
+                <span style="float: right;">{{ grid_pager_totalcount(grid) }}</span>
+            </div>
+        </div>
+
         <div class="row mt-3">
             <div class="col-12">
                 <div class="grid_header">
@@ -28,12 +34,14 @@
                     {% endif %}
                 </div>
                 <div class="grid_body">
-                    <table class="table table-hover">
-                        {% if grid.isTitleSectionVisible %}
-                            {{ grid_titles(grid) }}
-                        {% endif %}
-                        {{ grid_rows(grid)|raw }}
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            {% if grid.isTitleSectionVisible %}
+                                {{ grid_titles(grid) }}
+                            {% endif %}
+                            {{ grid_rows(grid)|raw }}
+                        </table>
+                    </div>
                 </div>
                 <div class="grid_footer">
                     {% if grid.isPagerSectionVisible %}
@@ -100,12 +108,7 @@
                 {% set columnTitle = columnTitle %}
 
                 {% if (column.sortable) %}
-                    <a class="order" href="{{ grid_url('order', grid, column) }}" title="{{ 'Order by' }} {{ columnTitle }}" style="color: black !important;">{{ columnTitle }}</a>
-                    {% if column.order == 'asc' %}
-                        <i class="fas fa-sort-up"></i>
-                    {% elseif column.order == 'desc' %}
-                        <i class="fas fa-sort-down"></i>
-                    {% endif %}
+                    <a class="order" href="{{ grid_url('order', grid, column) }}" title="{{ 'Order by' }} {{ columnTitle }}" style="color: black !important;">{{ columnTitle }} <i class="fas fa-sort" style="color: #d9d9d9"></i></a>
                 {% else %}
                     {{ columnTitle }}
                 {% endif %}
@@ -118,23 +121,38 @@
 {% endblock grid_titles %}
 {# -------------------------------------------------- grid_filters -------------------------------------------------- #}
 {% block grid_filters %}
-    <table class="table">
-        <tr class="grid-row-filters">
-            {% for column in grid.columns %}
-                {% if column.visible(grid.isReadyForExport) %}
-                    {% if loop.last %}
-                        <tr/>
-                        <tr>
-                            <td class="last-column" style="border-top: none;">
-                                <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
-                                <a class="grid-reset btn btn-danger" href="{{ grid_url('reset', grid) }}">{{ 'Reset' }}</a>
-                            </td>
-                    {% endif %}
-                    <td class="{% if column.class %}{{ column.class }}{% endif %}" style="{% if(column.size > -1) %} width:{{ column.size }}px;{% endif %} border-top: none;">{% if column.filterable %}{{ grid_filter(column, grid)|raw }}{% endif %}</td>
-                {% endif %}
-            {% endfor %}
-        </tr>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr class="grid-row-filters">
+                    {% for column in grid.columns %}
+                        {% if column.visible(grid.isReadyForExport) %}
+                            {% if column.id != '__actions' %}
+                                <th style="border-bottom: none;padding-bottom: 0;">{% if column.filterable %}{{ column.title }}:{% endif %}</th>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="grid-row-filters">
+                    {% for column in grid.columns %}
+                        {% if column.visible(grid.isReadyForExport) %}
+                        <td class="{% if column.class %}{{ column.class }}{% endif %}" style="{% if(column.size > -1) %} width:{{ column.size }}px;{% endif %} border-top: none;padding-top: 0;">{% if column.filterable %}{{ grid_filter(column, grid)|raw }}{% endif %}</td>
+                            {% if loop.last %}
+                                <tr/>
+                                <tr>
+                                    <td class="last-column" style="border-top: none;">
+                                        <button type="submit" class="btn btn-primary"><i class="fas fa-filter"></i> Filter</button>
+                                        <a class="grid-reset btn btn-danger" href="{{ grid_url('reset', grid) }}">{{ 'Reset' }}</a>
+                                    </td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </tbody>
+        </table>
+    </div>
 {% endblock grid_filters %}
 {# -------------------------------------------------- grid_search -------------------------------------------------- #}
 {% block grid_search %}
@@ -182,11 +200,6 @@
         {{ grid_pagerfanta(grid) }}
     {% else %}
         <div class="pager">
-            <div class="row">
-                <div class="col-12">
-                    <span style="float: right;">{{ grid_pager_totalcount(grid) }}</span>
-                </div>
-            </div>
             <div class="row mt-3">
                 <div class="col-6">
                     {{ grid_pager_results_perpage(grid) }}
@@ -202,7 +215,7 @@
 {% endblock grid_pager %}
 {# ---------------------------------------------------- grid_pager_totalcount -------------------------------------------------- #}
 {% block grid_pager_totalcount %}
-{{ 'Showing %limit% Out Of A Total %count% Results' | trans({'%count%': grid.totalCount, '%limit%': grid.limit}) }}
+{{ 'Page %page% Of %count% - %results% Records' | trans({'%page%': grid.page+1, '%count%': grid.pageCount, '%results%': grid.totalCount}) }}
 {% endblock grid_pager_totalcount %}
 {# ---------------------------------------------------- grid_pager_selectpage -------------------------------------------------- #}
 {% block grid_pager_selectpage %}
@@ -211,7 +224,7 @@
             <li class="page-item {% if grid.page <= 0 %}disabled{% endif %}"><button class="page-link" onclick="return {{ grid.hash }}_previousPage();">Previous</button></li>
             {% for i in range(1, grid.pageCount) %}
                 {% set count = i - 1 %}
-                <li class="page-item {% if grid.page == count|number_format %}active{% endif %}"><button class="page-link" onkeypress="return {{ grid.hash }}_enterPage(event, parseInt(this.value)-1);">{{ i }}</button></li>
+                <li class="page-item {% if grid.page == count|number_format %}active{% endif %}"><button class="page-link" onclick="return {{ grid.hash }}_enterPage({{ grid.page + 1 }});">{{ i }}</button></li>
             {% endfor %}
             <li class="page-item {% if grid.page >= grid.pageCount-1 %}disabled{% endif %}"><button class="page-link" onclick="return {{ grid.hash }}_nextPage();">Next</button></li>
         </ul>
@@ -326,7 +339,11 @@
 {% endblock grid_column_massaction_cell %}
 {# ------------------------------------------------ grid_column_type_boolean_cell --------------------------------------------- #}
 {% block grid_column_boolean_cell %}
-    <span class="grid_boolean_{{ value }}" title="{{ value }}">{{ block('grid_column_cell') }}</span>
+    {% if value is same as 'true' %}
+        <span class="grid_boolean_{{ value }}" title="{{ value }}"><i class="fas fa-check" style="color: green;font-size: 25px;"></i></span>
+    {% elseif value is same as 'false' %}
+        <span class="grid_boolean_{{ value }}" title="{{ value }}"><i class="fas fa-times" style="color: red;font-size: 25px;"></i></span>
+    {% endif %}
 {% endblock grid_column_boolean_cell %}
 {% block grid_column_type_boolean_cell %}
 	{{ block('grid_column_boolean_cell') }}
@@ -434,33 +451,13 @@
 <span class="grid-filter-select">
     {{ grid_column_operator(column, grid, op, submitOnChange) }}
     <span class="grid-filter-select-query">
-    {% if expanded %}
-        <span class="grid-filter-select-query-from" id="{{ grid.hash }}__{{ column.id }}__query__from" {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none;" disabled="disabled"' : '' }}>
-        {% for key, value in column.values %}
-            <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ grid.hash }}[{{ column.id }}][from][]" value="{{ key }}" {% if key in from %} checked="checked"{% endif %} {% if submitOnChange is same as (true) %}onclick="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%}/><label>{{ value }}</label></span>
-        {% endfor %}
-        </span>
-        <span class="grid-filter-select-query-to" id="{{ grid.hash }}__{{ column.id }}__query__to" {{ ( op == btwOperator or op == btweOperator ) ? '': 'style="display: none;" disabled="disabled"' }}>
-        {% for key, value in column.values %}
-            <span><input type="{% if multiple %}checkbox{% else %}radio{% endif %}" name="{{ grid.hash }}[{{ column.id }}][to]" value="{{ key }}" {% if not to is null and to == key %} checked="checked"{% endif %} {% if submitOnChange is same as (true) %}onclick="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%}/><label>{{ value }}</label></span>
-        {% endfor %}
-        </span>
-        {% if multiple %}<input type="submit" value="{{ 'Go' }}" />{% endif %}
-    {% else %}
-        <select{% if multiple %} multiple="multiple"{% endif %} name="{{ grid.hash }}[{{ column.id }}][from][]" class="grid-filter-select-query-from" id="{{ grid.hash }}__{{ column.id }}__query__from" {% if submitOnChange is same as (true) %}onchange="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%} {{ ( op == isNullOperator or op == isNotNullOperator ) ? 'style="display: none;" disabled="disabled"' : '' }}>
-            <option value="">&nbsp;</option>
-            {% for key, value in column.values %}
-                <option value="{{ key }}"{% if key in from %} selected="selected"{% endif %}>{{ value }}</option>
-            {% endfor %}
-        </select>
-        <select name="{{ grid.hash }}[{{ column.id }}][to]" class="grid-filter-select-query-to" id="{{ grid.hash }}__{{ column.id }}__query__to" {% if submitOnChange is same as (true) %}onchange="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%} {{ ( op == btwOperator or op == btweOperator ) ? '': 'style="display: none;" disabled="disabled"' }}>
+        <select name="{{ grid.hash }}[{{ column.id }}][to]" class="grid-filter-select-query-to" id="{{ grid.hash }}__{{ column.id }}__query__to" {% if submitOnChange is same as (true) %}onchange="return {{ grid.hash }}_submitForm(event, this.form);"{% endif%} {{ ( op == btwOperator or op == btweOperator ) ? '': 'style="display: none;"' }}>
             <option value="">&nbsp;</option>
             {% for key, value in column.values %}
                 <option value="{{ key }}"{% if not to is null and to == key %} selected="selected"{% endif %}>{{ value }}</option>
             {% endfor %}
         </select>
         {% if multiple %}<input type="submit" value="{{ 'Go' }}" />{% endif %}
-    {% endif %}
     </span>
 </span>
 {% endblock grid_column_filter_type_select %}
@@ -494,7 +491,6 @@
 function {{ grid.hash }}_goto(url)
 {
     window.location.href = url;
-    console.log(url);
 
     return false;
 }
@@ -528,7 +524,7 @@ function {{ grid.hash }}_nextPage()
 {% endblock grid_scripts_next_page %}
 
 {% block grid_scripts_enter_page %}
-function {{ grid.hash }}_enterPage(event, page)
+function {{ grid.hash }}_enterPage(page)
 {
     {{ grid.hash }}_goto('{{ grid_url('page', grid) }}' + page);
 
