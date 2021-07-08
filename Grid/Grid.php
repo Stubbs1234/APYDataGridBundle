@@ -26,6 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\TemplateWrapper;
 
 class Grid implements GridInterface
@@ -371,12 +372,12 @@ class Grid implements GridInterface
 
         // Route
         if (null !== $config->getRoute()) {
-            $this->setRouteUrl($this->router->generate($config->getRoute(), $routeParameters));
+            $this->setRouteUrl($this->router->generate($this->request->get('_route'), $this->getRouteParameters(), UrlGeneratorInterface::ABSOLUTE_PATH));
         }
 
         // Route
         if (null !== $config->getRoute()) {
-            $this->setRouteUrl($this->router->generate($config->getRoute(), $routeParameters));
+            $this->setRouteUrl($this->router->generate($this->request->get('_route'), $this->getRouteParameters(), UrlGeneratorInterface::ABSOLUTE_PATH));
         }
 
         // Columns
@@ -513,7 +514,6 @@ class Grid implements GridInterface
         }
 
         $this->createHash();
-
         $this->requestData = (array) $this->request->get($this->hash);
 
         $this->processPersistence();
@@ -2115,15 +2115,20 @@ class Grid implements GridInterface
     /**
      * Redirects or Renders a view - helper function.
      *
-     * @param string|array $param1   The view name or an array of parameters to pass to the view
-     * @param string|array $param2   The view name or an array of parameters to pass to the view
-     * @param Response     $response A response instance
+     * @param null $param1 The view name or an array of parameters to pass to the view
+     * @param null $param2 The view name or an array of parameters to pass to the view
+     * @param Response|null $response A response instance
      *
      * @return Response A Response instance
+     * @throws \Exception
      */
     public function getGridResponse($param1 = null, $param2 = null, Response $response = null)
     {
         $isReadyForRedirect = $this->isReadyForRedirect();
+//        if ($isReadyForRedirect) {
+//            $this->redirect = false;
+//            new RedirectResponse($this->router->generate($this->request->get('_route'), $this->getRouteParameters(), UrlGeneratorInterface::ABSOLUTE_PATH));
+//        }
 
 //        if ($this->isReadyForExport()) {
 //            return $this->getExportResponse();
